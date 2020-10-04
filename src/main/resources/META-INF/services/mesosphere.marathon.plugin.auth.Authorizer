@@ -1,1 +1,1 @@
-io.containx.marathon.plugin.auth.LDAPAuthorizor
+io.containx.marathon.plugin.auth.LDAPAuthorizer

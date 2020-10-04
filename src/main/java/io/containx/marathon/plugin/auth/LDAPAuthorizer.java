@@ -14,9 +14,9 @@ import mesosphere.marathon.plugin.http.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class LDAPAuthorizor implements Authorizer {
+public class LDAPAuthorizer implements Authorizer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LDAPAuthorizor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LDAPAuthorizer.class);
 
     @Override
     public <Resource> boolean isAuthorized(Identity identity, AuthorizedAction<Resource> authorizedAction, Resource resource) {
