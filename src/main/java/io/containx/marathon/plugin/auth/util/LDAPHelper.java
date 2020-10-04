@@ -100,16 +100,42 @@ public final class LDAPHelper {
                 LOGGER.debug("LDAP user search found {}", result.toString());
 
                 if (bindUser != null) {
-                    dn = bindUser.replace("{username}", username);
-                    bindPassword = (config.getBindPassword() == null) ? userPassword : config.getBindPassword();
+                    if (bindUser.contains("{username}")) {
+                        dn = bindUser.replace("{username}", username);
+                        bindPassword = (config.getBindPassword() == null) ? userPassword : config.getBindPassword();
 
-                    LOGGER.debug("Authenticate with DN {}", dn);
-                    env.put(Context.SECURITY_PRINCIPAL, dn);
-                    env.put(Context.SECURITY_CREDENTIALS, bindPassword);
+                        LOGGER.debug("Authenticate with DN {}", dn);
+                        env.put(Context.SECURITY_PRINCIPAL, dn);
+                        env.put(Context.SECURITY_CREDENTIALS, bindPassword);
 
-                    context = new InitialDirContext(env);
+                        context = new InitialDirContext(env);
 
-                    LOGGER.debug("LDAP Auth succeeded for user {}", dn);
+                        LOGGER.debug("LDAP Auth succeeded for user {}", dn);
+                    } else {
+                        if (userPassword.isEmpty()) {
+                            return null;
+                        }
+                        dn = result.getNameInNamespace();
+
+                        LOGGER.debug("Authenticate with DN {}", dn);
+
+                        env.put(Context.SECURITY_PRINCIPAL, dn);
+                        env.put(Context.SECURITY_CREDENTIALS, userPassword);
+                        context = new InitialDirContext(env);
+
+                        LOGGER.debug("LDAP Auth succeeded for user {}", dn);
+
+                        dn = bindUser;
+                        bindPassword = config.getBindPassword();
+
+                        LOGGER.debug("Authenticate with DN {}", dn);
+
+                        env.put(Context.SECURITY_PRINCIPAL, dn);
+                        env.put(Context.SECURITY_CREDENTIALS, bindPassword);
+                        context = new InitialDirContext(env);
+
+                        LOGGER.debug("LDAP Auth succeeded for user {}", dn);
+                    }
                 } else {
                     dn = result.getNameInNamespace();
 

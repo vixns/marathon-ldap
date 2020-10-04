@@ -131,7 +131,7 @@ public class LDAPAuthenticator implements Authenticator, PluginConfiguration {
             try {
                 Set<String> memberships = LDAPHelper.validate(username, password, config.getLdap());
                 if (memberships != null) {
-                    return new UserIdentity(username, memberships).applyResolvePermissions(config);
+                    return new UserIdentity(username, password, memberships).applyResolvePermissions(config);
                 } else {
                     return null;
                 }
