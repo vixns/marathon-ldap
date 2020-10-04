@@ -52,9 +52,9 @@ public class LDAPAuthenticator implements Authenticator, PluginConfiguration {
     public void initialize(scala.collection.immutable.Map<String, Object> map, JsObject jsObject) {
         Map<String, JsValue> conf = scala.collection.JavaConverters.mapAsJavaMap(jsObject.value());
         String intervalKey = "refresh-interval-seconds";
-        if(conf.containsKey(intervalKey)){
+        if (conf.containsKey(intervalKey)) {
             refreshInterval = Long.parseLong(conf.get(intervalKey).toString());
-            if(refreshInterval <= 0) {
+            if (refreshInterval <= 0) {
                 refreshInterval = DEFAULT_INTERVAL_IN_SECONDS;
             }
         }
@@ -78,7 +78,7 @@ public class LDAPAuthenticator implements Authenticator, PluginConfiguration {
         try {
             config = new ObjectMapper().readValue(jsObject.toString(), Configuration.class);
             configUpdaterTask.initialize(config);
-            if(config.getLdap().getRulesUpdaterBindUser() != null ) {
+            if (config.getLdap().getRulesUpdaterBindUser() != null) {
                 scheduler.scheduleAtFixedRate(configUpdaterTask, 0, refreshInterval, TimeUnit.SECONDS);
             }
         } catch (Exception e) {
@@ -111,11 +111,11 @@ public class LDAPAuthenticator implements Authenticator, PluginConfiguration {
                 UserIdentity id = USERS.get(ak);
 
                 if (id != null && ak.getPassword().equals(id.getPassword())) {
-                        return id.applyResolvePermissions(config);
+                    return id.applyResolvePermissions(config);
                 }
             }
         } catch (Exception ex) {
-            LOGGER.error("LDAP error validating user: {}", ex);
+            LOGGER.error("LDAP error validating user:", ex);
         }
         return null;
     }
@@ -127,7 +127,7 @@ public class LDAPAuthenticator implements Authenticator, PluginConfiguration {
         int count = 0;
         int maxTries = 5;
 
-        while(true) {
+        while (true) {
             try {
                 Set<String> memberships = LDAPHelper.validate(username, password, config.getLdap());
                 if (memberships != null) {
@@ -136,7 +136,7 @@ public class LDAPAuthenticator implements Authenticator, PluginConfiguration {
                     return null;
                 }
             } catch (Exception ex) {
-                LOGGER.error("LDAP error Exception: {}", ex);
+                LOGGER.error("LDAP error Exception:", ex);
                 if (++count == maxTries) throw ex;
             }
         }

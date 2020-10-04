@@ -38,7 +38,7 @@ public final class LDAPHelper {
         int count = 0;
         int maxTries = 5;
 
-        while(true) {
+        while (true) {
             DirContext context = null;
 
             try {
@@ -89,7 +89,7 @@ public final class LDAPHelper {
                 }
                 LOGGER.debug("LDAP searching {} in {}", searchString, searchContext);
                 NamingEnumeration<SearchResult> renum =
-                    context.search(searchContext, searchString, controls);
+                        context.search(searchContext, searchString, controls);
 
                 if (!renum.hasMore()) {
                     LOGGER.warn("LDAP cannot locate user information for {}", username);
@@ -216,7 +216,7 @@ public final class LDAPHelper {
         int count = 0;
         int maxTries = 5;
 
-        while(true) {
+        while (true) {
             DirContext context = null;
 
             try {
@@ -244,34 +244,34 @@ public final class LDAPHelper {
                 // openLDAP needs the following (assumption).  Does anything else break if it's added?
                 controls.setReturningAttributes(new String[]{"*", "+"});
 
-                    String searchString = "(&(ObjectClass=marathonAccess)(ObjectClass=groupOfNames))";
-                    String searchContext = config.getBase();
-                    if (config.getUserSubTree() != null) {
-                        searchContext = config.getGroupSubTree() +
-                                "," + searchContext;
-                    }
-                    LOGGER.debug("LDAP searching for access rules {} in {}", searchString, searchContext);
-                    NamingEnumeration<SearchResult> renum = context.search(searchContext, searchString, controls);
+                String searchString = "(&(ObjectClass=marathonAccess)(ObjectClass=groupOfNames))";
+                String searchContext = config.getBase();
+                if (config.getUserSubTree() != null) {
+                    searchContext = config.getGroupSubTree() +
+                            "," + searchContext;
+                }
+                LOGGER.debug("LDAP searching for access rules {} in {}", searchString, searchContext);
+                NamingEnumeration<SearchResult> renum = context.search(searchContext, searchString, controls);
 
-                    while (renum.hasMore()) {
-                        SearchResult group = renum.next();
-                        String groupName = group.getAttributes().get("cn").get().toString();
-                        Access access = new Access();
-                        access.setGroup(groupName);
-                        Set<Permission> permissions = new HashSet<>();
-                        NamingEnumeration<?> rules = group.getAttributes().get("marathonAccessRule").getAll();
-                        while (rules.hasMore()) {
-                            try {
-                                Permission p = new ObjectMapper().readValue(rules.next().toString(), Permission.class);
-                                permissions.add(p);
-                            } catch(IOException e) {
-                                LOGGER.error("Error reading permission JSON: {}", e.getMessage(), e);
-                            }
+                while (renum.hasMore()) {
+                    SearchResult group = renum.next();
+                    String groupName = group.getAttributes().get("cn").get().toString();
+                    Access access = new Access();
+                    access.setGroup(groupName);
+                    Set<Permission> permissions = new HashSet<>();
+                    NamingEnumeration<?> rules = group.getAttributes().get("marathonAccessRule").getAll();
+                    while (rules.hasMore()) {
+                        try {
+                            Permission p = new ObjectMapper().readValue(rules.next().toString(), Permission.class);
+                            permissions.add(p);
+                        } catch (IOException e) {
+                            LOGGER.error("Error reading permission JSON: {}", e.getMessage());
                         }
-                        access.setPermissions(permissions);
-                        accessRules.add(access);
-                        LOGGER.debug("LDAP found {} in group {}", group, groupName);
                     }
+                    access.setPermissions(permissions);
+                    accessRules.add(access);
+                    LOGGER.debug("LDAP found {} in group {}", group, groupName);
+                }
 
                 LOGGER.debug("LDAP accessRules {}", accessRules);
                 return accessRules;

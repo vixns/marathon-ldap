@@ -5,18 +5,18 @@ import mesosphere.marathon.plugin.http.HttpRequest;
 import mesosphere.marathon.plugin.http.HttpResponse;
 import scala.Option;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
-public final class HTTPHelper
-{
+public final class HTTPHelper {
 
     //private static final Logger LOGGER = LoggerFactory.getLogger(HTTPHelper.class);
 
-    public static AuthKey authKeyFromHeaders(HttpRequest request) throws Exception {
+    public static AuthKey authKeyFromHeaders(HttpRequest request) {
         Option<String> header = request.header("Authorization").headOption();
         if (header.isDefined() && header.get().startsWith("Basic ")) {
             String encoded = header.get().replaceFirst("Basic ", "");
-            String decoded = new String(Base64.getDecoder().decode(encoded), "UTF-8");
+            String decoded = new String(Base64.getDecoder().decode(encoded), StandardCharsets.UTF_8);
             String[] userPass = decoded.split(":", 2);
 
             return AuthKey.with(userPass[0], userPass[1]);
