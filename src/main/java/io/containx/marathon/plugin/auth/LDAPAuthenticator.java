@@ -59,8 +59,8 @@ public class LDAPAuthenticator implements Authenticator, PluginConfiguration {
             }
         }
         USERS = CacheBuilder.newBuilder()
-                .maximumSize(2000)
-                .expireAfterWrite(60, TimeUnit.MINUTES)
+                .maximumSize(20000)
+                .expireAfterWrite(refreshInterval * 2, TimeUnit.SECONDS)
                 .refreshAfterWrite(refreshInterval + 2, TimeUnit.SECONDS)
                 .build(
                         CacheLoader.asyncReloading(
